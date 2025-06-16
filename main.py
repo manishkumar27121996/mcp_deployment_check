@@ -21,7 +21,7 @@ def divide_numbers(a: int, b: int) -> float:
     if b == 0:
         raise ValueError("Cannot divide by zero.")
     return a / b
-
+app = mcp.streamable_http_app()
 if __name__ == "__main__":
     #mcp.run(transport="streamable-http", host="127.0.0.1", port=8000)
     mcp.run(transport="streamable-http", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
