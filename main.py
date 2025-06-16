@@ -29,6 +29,7 @@ from typing import Any
 import httpx
 from fastmcp import FastMCP
 import os 
+from fastapi import FastAPI
 # Initialize FastMCP server
 mcp = FastMCP("weather")
 
@@ -115,7 +116,18 @@ Forecast: {period['detailedForecast']}
         forecasts.append(forecast)
 
     return "\n---\n".join(forecasts)
-app = mcp.streamable_http_app()
+#app = mcp.streamable_http_app()
+http_app = mcp.http_app()                         # Streamable HTTP (/mcp)
+sse_app = mcp.http_app(transport="sse")
+
+app = FastAPI(lifespan=http_app.lifespan)
+app.mount("/mcp", http_app)
+app.mount("/sse", sse_app)
+
+
 if __name__ == "__main__":
     # Initialize and run the server
-    mcp.run(transport="streamable-http", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+    import uvicorn
+    #mcp.run(transport="streamable-http", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT",8000)))
+
